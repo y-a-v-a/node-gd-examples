@@ -1,14 +1,21 @@
-var gd = require('node-gd');
-var output = '../output/image-watermark.png';
+const gd = require('node-gd');
+const output = `../output/image-watermark-${Date.now()}.png`;
 
-var watermark = gd.createFromPng('../input/watermark.png');
-var input = gd.createFromPng('../input/input.png');
+async function main() {
+  var watermark = await gd.createFromPng('../input/watermark.png');
+  var input = await gd.createFromPng('../input/input.png');
 
-watermark.alphaBlending(1);
-watermark.saveAlpha(1);
+  watermark.alphaBlending(1);
+  // turn on saving alpha channel of pixels (only png and gif)
+  watermark.saveAlpha(1);
 
-watermark.copy(input, 0, 0, 0, 0, 100, 100);
+  // copy "watermark" to destination "input"
+  watermark.copy(input, 0, 0, 0, 0, 100, 100);
 
-input.savePng(output, 0, function(error) {
-  if (error) throw error;
-});
+  await input.savePng(output, 0);
+
+  watermark.destroy();
+  input.destroy();
+}
+
+main();
